@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.session.HttpSessionEventPublisher; // Import added
 
 import javax.sql.DataSource;
 
@@ -27,7 +28,7 @@ public class WebSecurityConfiguration {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    // 2. BEAN ADDED
+
     /**
      * This bean is essential for Spring Security to handle session lifecycle events,
      * which is required for concurrent session control.
@@ -45,6 +46,7 @@ public class WebSecurityConfiguration {
     public UserDetailsService userDetailsService(DataSource dataSource) {
         return new JdbcUserDetailsManager(dataSource);
     }
+
 
     /**
      * Configures all HTTP security rules for the application.
@@ -65,17 +67,16 @@ public class WebSecurityConfiguration {
                         .logoutUrl("/logoutMe")
                         .logoutSuccessUrl("/loggedout")
                 )
+                // --- THIS PART WAS ADDED ---
                 .sessionManagement(session -> session
                         .maximumSessions(1)
-                        .maxSessionsPreventsLogin(false)
+                )
+                // -------------------------
                 // Disabling CSRF for simplicity.
-                // NOTE: It's generally not recommended to disable CSRF in production applications.
                 .csrf(csrf -> csrf.disable())
-
                 // This part handles access denied errors and redirects to your custom page
                 .exceptionHandling(exception ->
                         exception.accessDeniedPage("/access-denied")
-                                   
                 );
 
         return http.build();
