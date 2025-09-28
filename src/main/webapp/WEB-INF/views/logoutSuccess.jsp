@@ -1,0 +1,4 @@
+<h2>
+YOU ARE SUCCESSFULLY LOGGEDOUT...!
+</h2>
+<a href="index">GOTO THE INDEX PAGE</a>
