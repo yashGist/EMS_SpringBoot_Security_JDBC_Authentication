@@ -27,6 +27,15 @@ public class WebSecurityConfiguration {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+    // 2. BEAN ADDED
+    /**
+     * This bean is essential for Spring Security to handle session lifecycle events,
+     * which is required for concurrent session control.
+     */
+    @Bean
+    public HttpSessionEventPublisher httpSessionEventPublisher() {
+        return new HttpSessionEventPublisher();
+    }
 
     /**
      * Configures Spring Security to use your database for authentication.
@@ -56,6 +65,9 @@ public class WebSecurityConfiguration {
                         .logoutUrl("/logoutMe")
                         .logoutSuccessUrl("/loggedout")
                 )
+                .sessionManagement(session -> session
+                        .maximumSessions(1)
+                        .maxSessionsPreventsLogin(false)
                 // Disabling CSRF for simplicity.
                 // NOTE: It's generally not recommended to disable CSRF in production applications.
                 .csrf(csrf -> csrf.disable())
@@ -63,6 +75,7 @@ public class WebSecurityConfiguration {
                 // This part handles access denied errors and redirects to your custom page
                 .exceptionHandling(exception ->
                         exception.accessDeniedPage("/access-denied")
+                                   
                 );
 
         return http.build();
